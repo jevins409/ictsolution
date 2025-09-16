@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FARREL ICT SOLUTIONS - Login</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#26d0ce">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+        background: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)),
+              url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .title {
+      position: absolute;
+      top: 20px;
+      font-size: 48px;
+      font-weight: bold;
+      text-align: center;
+      animation: colorCycle 4s infinite;
+    }
+
+    @keyframes colorCycle {
+      0% { color: #26d0ce; }
+      25% { color: #ff4d6d; }
+      50% { color: #f9c74f; }
+      75% { color: #6a4c93; }
+      100% { color: #26d0ce; }
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .login-box {
+      position: relative;
+      background: rgba(30, 30, 30, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 40px;
+      border-radius: 15px;
+      text-align: center;
+      width: 320px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+      color: #ddd;
+      overflow: hidden;
+    }
+
+    .login-box h2 {
+      margin-bottom: 20px;
+      color: #f0f0f0;
+      position: relative;
+    }
+
+    .login-box input {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #eee;
+      font-size: 14px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .login-box input::placeholder { color: #bbb; }
+    .login-box input:focus { background-color: rgba(255, 255, 255, 0.2); outline: none; transform: scale(1.02); }
+
+    /* Login button with different color */
+    .login-box button {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      background-color: #0f8a5f;  /* different color */
+      color: #fff;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    .login-box button:hover {
+      background-color: #0c6949;
+      transform: scale(1.02);
+    }
+
+    .login-box .links { margin-top: 15px; }
+    .login-box .links a {
+      color: #0f8a5f;
+      text-decoration: none;
+      font-size: 0.9em;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.3s ease;
+    }
+    .login-box .links a:hover { color: #26d0ce; }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      color: #bbb;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+<div class="title">FARREL ICT SOLUTIONS</div>
+
+<div class="container">
+  <div class="login-box">
+    <form id="loginForm">
+      <h2>Login</h2>
+      <input type="text" id="username" placeholder="Username" required>
+      <input type="password" id="password" placeholder="Password (Admins only)">
+      <button type="submit">Login</button>
+      <div class="links">
+        <a onclick="showSignup()">Sign Up (Admin only)</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<footer>©Farrels 2025</footer>
+
+<script>
+    // Admin storage helpers
+    function adminExists(){return !!localStorage.getItem("adminUser");}
+    function getAdminUser(){const data=localStorage.getItem("adminUser");return data?JSON.parse(data):null;}
+    function saveAdminUser(username,password){localStorage.setItem("adminUser",JSON.stringify({username,password}));}
+
+    // Login
+    const loginForm=document.getElementById("loginForm");
+    loginForm.addEventListener("submit",e=>{
+      e.preventDefault();
+      const username=document.getElementById("username").value.trim();
+      const password=document.getElementById("password").value;
+      const adminUser=getAdminUser();
+
+      if(adminUser && username===adminUser.username && password===adminUser.password){
+        sessionStorage.setItem("authenticated","true");
+        sessionStorage.setItem("username",username);
+        sessionStorage.setItem("role","admin");
+        alert("Welcome Admin!");
+        window.location.href="dashboard.html";
+        return;
+      }
+
+      if(username && !password){
+        sessionStorage.setItem("authenticated","true");
+        sessionStorage.setItem("username",username);
+        sessionStorage.setItem("role","guest");
+        alert(`Welcome Guest ${username}! Limited access granted.`);
+        window.location.href="dashboard.html";
+        return;
+      }
+
+      alert("Invalid credentials.");
+    });
+
+    function showSignup(){
+      if(adminExists()){alert("Admin account already exists. Please login."); return;}
+      document.body.innerHTML=`
+        <div class="container">
+          <div class="login-box">
+            <div class="animated-text">CREATE ADMIN ACCOUNT</div>
+            <form id="signupForm">
+              <input type="text" id="newUsername" placeholder="Choose Admin Username" required>
+              <input type="password" id="newPassword" placeholder="Choose Password" required>
+              <button type="submit">Sign Up</button>
+              <div class="links"><a onclick="location.reload()">Back to Login</a></div>
+            </form>
+          </div>
+        </div>
+      `;
+      document.getElementById("signupForm").addEventListener("submit",function(e){
+        e.preventDefault();
+        const newUsername=document.getElementById("newUsername").value.trim();
+        const newPassword=document.getElementById("newPassword").value;
+        if(!newUsername || !newPassword){alert("Please fill in all fields."); return;}
+        saveAdminUser(newUsername,newPassword);
+        alert("Admin account created! You can now log in.");
+        location.reload();
+      });
+    }
+  </script>
+</body>
+</html>

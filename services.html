@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#26d0ce">
+    <style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a2980, #26d0ce);
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  h1 {
+    text-align: center;
+    color: white;
+    margin-top: 20px;
+  }
+  .back-btn {
+    display: block;
+    margin: 10px auto;
+    background: #f4f4f4;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .back-btn:hover { background: #ddd; }
+
+  /* Guest Form Styling */
+  form {
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 25px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    color: white;
+  }
+  form label { display: block; margin-top: 10px; font-weight: bold; }
+  form input, form textarea {
+    width: 100%; padding: 12px; margin-top: 8px; border: none; border-radius: 8px; outline: none;
+  }
+  form button {
+    width: 100%; padding: 12px; margin-top: 15px;
+    border: none; border-radius: 8px; background: #26d0ce;
+    font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s;
+  }
+  form button:hover { background: #1a2980; color: white; }
+
+  /* Admin Table */
+  table {
+    width: 95%;
+    margin: 30px auto;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+  th { background: #1a2980; color: white; }
+  .done { color: green; font-weight: bold; }
+  .pending { color: red; font-weight: bold; }
+  .reason { color: orange; font-style: italic; }
+
+  footer {
+    margin-top: auto;
+    text-align: center;
+    padding: 15px;
+    background: rgba(0,0,0,0.5);
+    color: white;
+  }
+
+  /* Toast Notification */
+  .toast {
+    visibility: hidden;
+    min-width: 250px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 16px;
+    position: fixed;
+    z-index: 1000;
+    right: 20px;
+    bottom: 30px;
+    font-size: 16px;
+    opacity: 0;
+    transition: opacity 0.5s, bottom 0.5s;
+  }
+  .toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+
+  /* Responsive */
+  @media(max-width:768px){
+    table { width: 100%; font-size: 14px; }
+    form { width: 90%; padding: 15px; }
+    h1 { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+<h1>Services</h1>
+<button class="back-btn" onclick="window.location.href='dashboard.html'">⬅ Back to Dashboard</button>
+
+<!-- Guest Request Form -->
+<div id="guestForm">
+    <form id="requestForm">
+        <label>Your Name:</label>
+        <input type="text" id="guestName" required>
+        <label>Your Location:</label>
+        <input type="text" id="guestLocation" required>
+        <label>Your Address:</label>
+        <input type="text" id="guestAddress" required>
+        <label>Your Phone Number:</label>
+        <input type="tel" id="guestPhone" required pattern="[0-9+ ]{7,15}" placeholder="+254700000000">
+        <label>Request Details:</label>
+        <textarea id="guestRequest" required></textarea>
+        <button type="submit">Submit Request</button>
+    </form>
+</div>
+
+<!-- Admin Request Table -->
+<div id="adminTable" style="display:none;">
+    <table>
+        <thead>
+        <tr>
+            <th>User</th>
+            <th>Location</th>
+            <th>Address</th>
+            <th>Phone</th>
+            <th>Request</th>
+            <th>Status</th>
+            <th>Reason</th>
+            <th>Start Time</th>
+            <th>Estimated Time</th>
+            <th>End Time</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody id="requestList"></tbody>
+    </table>
+</div>
+
+<footer id="footerNote"></footer>
+<div id="toast" class="toast">New request received!</div>
+
+<script>
+const role = sessionStorage.getItem("role");
+if(!role){
+  alert("You must log in first!");
+  window.location.href="index.html";
+}
+
+function showToast(message){
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.className = "toast show";
+  setTimeout(()=>{toast.className="toast"},4000);
+}
+
+if(role==="guest"){
+  document.getElementById("adminTable").style.display="none";
+  document.getElementById("guestForm").style.display="block";
+  document.getElementById("footerNote").textContent="Please input the service you would want to be taken care of";
+
+  document.getElementById("requestForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    const requests = JSON.parse(localStorage.getItem("requests")) || [];
+    requests.push({
+      user: document.getElementById("guestName").value,
+      location: document.getElementById("guestLocation").value,
+      address: document.getElementById("guestAddress").value,
+      phone: document.getElementById("guestPhone").value,
+      request: document.getElementById("guestRequest").value,
+      status:"Pending",
+      reason:"",
+      startTime: new Date().toLocaleString(),
+      estimatedTime:"",
+      endTime:""
+    });
+    localStorage.setItem("requests", JSON.stringify(requests));
+    alert("Request submitted successfully!");
+    this.reset();
+  });
+}
+
+if(role==="admin"){
+  document.getElementById("guestForm").style.display="none";
+  document.getElementById("adminTable").style.display="block";
+
+  const footer=document.getElementById("footerNote");
+  function updateFooter(){
+    const now = new Date();
+    footer.textContent = `Date: ${now.toLocaleDateString()} | Time: ${now.toLocaleTimeString()} | © 2025 Farrel 69'NES ICT SOLUTIONS`;
+  }
+  setInterval(updateFooter,1000);
+
+  const requestList=document.getElementById("requestList");
+  let requests=JSON.parse(localStorage.getItem("requests"))||[];
+  let lastCount=requests.length;
+
+  function renderRequests(){
+    requests=JSON.parse(localStorage.getItem("requests"))||[];
+    // Sort: Pending on top
+    requests.sort((a,b)=>{
+      if(a.status===b.status) return 0;
+      return a.status==="Pending"? -1 : 1;
+    });
+
+    if(requests.length>lastCount){
+      showToast("🔔 New service request received!");
+    }
+    lastCount=requests.length;
+
+    requestList.innerHTML="";
+    requests.forEach((r,i)=>{
+      const row=document.createElement("tr");
+      row.innerHTML=`
+        <td>${r.user}</td>
+        <td>${r.location}</td>
+        <td>${r.address}</td>
+        <td>${r.phone}</td>
+        <td>${r.request}</td>
+        <td class="${r.status.toLowerCase()}">${r.status}</td>
+        <td class="reason">${r.reason || "-"}</td>
+        <td>${r.startTime || "-"}</td>
+        <td>${r.estimatedTime || "-"}</td>
+        <td>${r.endTime || "-"}</td>
+        <td>
+          ${r.status==="Pending"?
+            `<button onclick="markDone(${i})">Mark Done</button>
+             <button onclick="addReason(${i})">Add Reason</button>
+             <button onclick="setEstimate(${i})">Set Estimate</button>`
+             :`<button onclick="clearReason(${i})">Clear Reason</button>`}
+        </td>
+      `;
+      requestList.appendChild(row);
+    });
+  }
+
+  window.markDone=function(i){
+    requests[i].status="Done";
+    requests[i].endTime=new Date().toLocaleString();
+    localStorage.setItem("requests", JSON.stringify(requests));
+    renderRequests();
+
+    const phone=requests[i].phone.replace(/\s+/g,"");
+    const name=requests[i].user;
+    const message=`Hello ${name}, your request has been completed. Thank you!`;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`,"_blank");
+  };
+
+  window.addReason=function(i){
+    const reason=prompt("Enter reason for pending status:");
+    if(reason){
+      requests[i].reason=reason;
+      localStorage.setItem("requests", JSON.stringify(requests));
+      renderRequests();
+    }
+  };
+
+  window.clearReason=function(i){
+    requests[i].reason="";
+    localStorage.setItem("requests", JSON.stringify(requests));
+    renderRequests();
+  };
+
+  window.setEstimate=function(i){
+    const est=prompt("Enter estimated completion time:");
+    if(est){
+      requests[i].estimatedTime=est;
+      localStorage.setItem("requests", JSON.stringify(requests));
+      renderRequests();
+    }
+  };
+
+  setInterval(renderRequests,3000);
+  renderRequests();
+}
+</script>
+</body>
+</html>

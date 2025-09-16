@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Farrel - Video Gallery</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#26d0ce">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+  /* Universal Responsive Reset */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden; /* Prevent sideways scroll */
+  }
+
+  img, video, iframe {
+    max-width: 100%;
+    height: auto; /* Keeps aspect ratio */
+    display: block;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow-x: auto;
+    display: block; /* Enables scroll on small screens */
+  }
+
+  input, textarea, button, select {
+    max-width: 100%;
+    font-size: 1rem;
+  }
+
+  /* Mobile First (default) */
+  header, nav, footer, main, section, article, div {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+    text-align: center;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  p, label {
+    font-size: 1rem;
+  }
+
+  /* Tablets */
+  @media (min-width: 600px) {
+    h1 { font-size: 2.2rem; }
+    h2 { font-size: 1.6rem; }
+    p, label { font-size: 1.1rem; }
+  }
+
+  /* Laptops */
+  @media (min-width: 992px) {
+    body { font-size: 1.1rem; }
+    h1 { font-size: 2.5rem; }
+    h2 { font-size: 1.8rem; }
+  }
+
+  /* Large Screens */
+  @media (min-width: 1200px) {
+    body { font-size: 1.2rem; }
+    h1 { font-size: 3rem; }
+    h2 { font-size: 2rem; }
+  }
+</style>
+
+    <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #654ea3, #eaafc8); /* different bg */
+      color: white;
+      min-height: 100vh;
+    }
+
+    header {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 20px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      position: relative;
+    }
+
+    .back-link {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 16px;
+      color: #f6c1ff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin: 20px;
+    }
+
+    input[type="file"], input[type="text"] {
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background: #f6a5ff;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #d47fe0;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .video-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .video-card video {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+      background: black;
+    }
+
+    .video-card .caption {
+      margin-top: 10px;
+      font-size: 14px;
+      word-break: break-word;
+    }
+
+    .btn-group {
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-group button {
+      flex: 1;
+      font-size: 12px;
+      padding: 6px 0;
+      border-radius: 5px;
+    }
+
+    .delete-btn {
+      background: #e65151;
+      color: white;
+    }
+
+    .share-btn {
+      background: #c084fc;
+      color: white;
+    }
+
+    /* Video Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .modal video {
+      max-width: 90%;
+      max-height: 80%;
+      border-radius: 10px;
+      outline: none;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    /* Share Modal (same as images tab) */
+    #shareModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    #shareModal.active {
+      display: flex;
+    }
+
+    #shareModalContent {
+      background: #222;
+      padding: 20px 30px;
+      border-radius: 12px;
+      color: #f6c1ff;
+      text-align: center;
+      max-width: 320px;
+      box-shadow: 0 0 20px #c084fcaa;
+    }
+
+    #shareModalContent h3 {
+      margin-bottom: 15px;
+    }
+
+    #shareModalContent ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #shareModalContent ul li {
+      margin: 10px 0;
+    }
+
+    #shareModalContent ul li button {
+      width: 100%;
+      background: #c084fc;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      font-size: 16px;
+    }
+
+    #shareModalContent ul li button:hover {
+      background-color: #a86de0;
+    }
+
+    #shareModalContent button.close-share {
+      margin-top: 15px;
+      background: #e65151;
+      color: white;
+      font-weight: bold;
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #shareModalContent button.close-share:hover {
+      background: #b33a3a;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.4);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+    <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+    Farrel's Video Gallery
+</header>
+
+<div class="controls">
+    <input type="file" id="videoInput" accept="video/*">
+    <input type="text" id="captionInput" placeholder="Enter caption...">
+    <button onclick="uploadVideo()">Upload Video</button>
+    <input type="text" id="searchInput" placeholder="Search by caption..." oninput="filterVideos()">
+</div>
+
+<div class="gallery" id="galleryContainer">
+    <!-- Videos will be inserted here -->
+</div>
+
+<!-- Video Modal -->
+<div class="modal" id="videoModal" onclick="closeModal()">
+    <video id="modalVideo" controls></video>
+</div>
+
+<!-- Share Modal -->
+<div id="shareModal">
+    <div id="shareModalContent" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
+        <h3 id="shareModalTitle">Share Video</h3>
+        <ul>
+            <li><button data-app="WhatsApp">WhatsApp</button></li>
+            <li><button data-app="Facebook">Facebook</button></li>
+            <li><button data-app="Twitter">Twitter</button></li>
+            <li><button data-app="Email">Email</button></li>
+            <li><button data-app="LinkedIn">LinkedIn</button></li>
+        </ul>
+        <button class="close-share">Cancel</button>
+    </div>
+</div>
+
+<footer>
+    &copy; 2025 Farrel ICT Services | Mombasa, Kenya
+</footer>
+
+<script>
+  function uploadVideo() {
+    const fileInput = document.getElementById('videoInput');
+    const captionInput = document.getElementById('captionInput');
+    const file = fileInput.files[0];
+    const caption = captionInput.value.trim();
+
+    if (!file) {
+      alert("Please select a video file.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const stored = JSON.parse(localStorage.getItem('galleryVideos')) || [];
+      stored.push({ src: e.target.result, caption });
+      localStorage.setItem('galleryVideos', JSON.stringify(stored));
+      renderGallery();
+      fileInput.value = '';
+      captionInput.value = '';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function renderGallery() {
+    const gallery = document.getElementById('galleryContainer');
+    gallery.innerHTML = '';
+    const videos = JSON.parse(localStorage.getItem('galleryVideos')) || [];
+    const search = document.getElementById('searchInput').value.toLowerCase();
+
+    videos.forEach((vid, index) => {
+      if (!vid.caption.toLowerCase().includes(search)) return;
+
+      const card = document.createElement('div');
+      card.className = 'video-card';
+
+      const video = document.createElement('video');
+      video.src = vid.src;
+      video.setAttribute('preload', 'metadata');
+      video.muted = true;
+      video.onclick = () => openModal(vid.src);
+
+      const caption = document.createElement('div');
+      caption.className = 'caption';
+      caption.innerText = vid.caption;
+
+      const btnGroup = document.createElement('div');
+      btnGroup.className = 'btn-group';
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete-btn';
+      deleteBtn.innerText = 'Delete';
+      deleteBtn.onclick = (e) => {
+        e.stopPropagation();
+        deleteVideo(index);
+      };
+
+      const shareBtn = document.createElement('button');
+      shareBtn.className = 'share-btn';
+      shareBtn.innerText = 'Share';
+      shareBtn.onclick = (e) => {
+        e.stopPropagation();
+        openShareModal(vid);
+      };
+
+      btnGroup.appendChild(deleteBtn);
+      btnGroup.appendChild(shareBtn);
+
+      card.appendChild(video);
+      card.appendChild(caption);
+      card.appendChild(btnGroup);
+
+      gallery.appendChild(card);
+    });
+  }
+
+  function deleteVideo(index) {
+    const confirmDelete = confirm("Delete this video?");
+    if (!confirmDelete) return;
+
+    const videos = JSON.parse(localStorage.getItem('galleryVideos')) || [];
+    videos.splice(index, 1);
+    localStorage.setItem('galleryVideos', JSON.stringify(videos));
+    renderGallery();
+  }
+
+  function openModal(src) {
+    const modal = document.getElementById('videoModal');
+    const modalVideo = document.getElementById('modalVideo');
+    modalVideo.src = src;
+    modalVideo.play();
+    modal.classList.add('active');
+  }
+
+  function closeModal() {
+    const modal = document.getElementById('videoModal');
+    const modalVideo = document.getElementById('modalVideo');
+    modalVideo.pause();
+    modalVideo.currentTime = 0;
+    modalVideo.src = '';
+    modal.classList.remove('active');
+  }
+
+  function filterVideos() {
+    renderGallery();
+  }
+
+  // Share Modal Logic (same as images tab)
+  const shareModal = document.getElementById('shareModal');
+  const shareModalContent = document.getElementById('shareModalContent');
+  let currentMediaToShare = null;
+
+  function openShareModal(media) {
+    currentMediaToShare = media;
+    shareModal.classList.add('active');
+  }
+
+  function closeShareModal() {
+    shareModal.classList.remove('active');
+    currentMediaToShare = null;
+  }
+
+  shareModalContent.querySelectorAll('ul button').forEach(button => {
+    button.addEventListener('click', () => {
+      if (!currentMediaToShare) return;
+      const app = button.getAttribute('data-app');
+      // Replace with actual sharing functionality or Web Share API
+      alert(`Sharing "${currentMediaToShare.caption || 'Video'}" via ${app}.\n\nThis is a demo action.`);
+      closeShareModal();
+    });
+  });
+
+  shareModalContent.querySelector('button.close-share').addEventListener('click', () => {
+    closeShareModal();
+  });
+
+  shareModal.addEventListener('click', (e) => {
+    if (e.target === shareModal) {
+      closeShareModal();
+    }
+  });
+
+  // Initial render
+  window.onload = renderGallery;
+</script>
+
+</body>
+</html>

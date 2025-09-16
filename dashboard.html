@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farrel 69'NES ICT Solutions - Dashboard</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#26d0ce">
+
+  <style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; font-family: 'Times New Roman', serif; color: white; }
+body { display: flex; flex-direction: column; overflow-x: hidden; }
+
+header {
+  background: linear-gradient(135deg, #1a2980, #26d0ce);
+  padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3); z-index: 10; position: relative;
+}
+
+.name-left { font-size: 22px; font-weight: bold; }
+
+.nav-right {
+  display: flex; gap: 20px; align-items: center; font-size: 16px; font-weight: 600;
+}
+.nav-right > div {
+  cursor: pointer; transition: color 0.3s ease; position: relative;
+}
+.nav-right > div:hover { color: #d1fff6; }
+.nav-right > div.inactive {
+  color: gray; cursor: not-allowed; pointer-events: none;
+}
+.nav-right > div.active { color: white; }
+
+.logout-btn {
+  background-color: #f44336; color: white; padding: 8px 16px;
+  border: none; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.3s;
+}
+.logout-btn:hover { background-color: #d32f2f; }
+
+.menu-toggle { display: none; font-size: 26px; background: none; border: none; color: white; cursor: pointer; }
+
+@media (max-width: 768px) {
+  .nav-right {
+    display: none; flex-direction: column; background: rgba(0,0,0,0.9);
+    position: absolute; top: 70px; right: 20px; padding: 20px; border-radius: 10px; width: 200px;
+  }
+  .nav-right.active { display: flex; }
+  .menu-toggle { display: block; }
+}
+
+main { position: relative; flex-grow: 1; overflow: hidden; }
+.slideshow {
+  position: absolute; width: 100%; height: 100%;
+  background-size: cover; background-position: center;
+  transition: opacity 1.5s ease-in-out; z-index: 1;
+}
+.main-text {
+  position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
+  z-index: 2; font-size: 42px; font-family: 'Segoe UI', sans-serif; font-weight: bold;
+  text-transform: uppercase; text-shadow: 3px 3px 10px rgba(0,0,0,0.8);
+  text-align: center; padding: 10px 20px; white-space: nowrap;
+  background: rgba(0,0,0,0.4); border-radius: 8px;
+}
+
+footer {
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,0.3); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  padding: 20px 40px; border-radius: 10px; text-align: center; z-index: 3;
+  font-size: 18px; font-weight: bold; line-height: 1.8; width: 100%;
+}
+footer a { color: #aafee2; text-decoration: none; font-weight: bold; }
+footer a:hover { text-decoration: underline; }
+
+.social-icons {
+  position: fixed; bottom: 20px; left: 20px; display: flex; gap: 15px; z-index: 100;
+}
+.social-icons a { color: white; font-size: 28px; text-decoration: none; transition: color 0.3s ease, transform 0.3s ease; }
+.social-icons a:hover { color: #1a2980; transform: scale(1.1); }
+.social-icons a:active { color: #26d0ce; }
+
+@media (max-width: 480px){
+  .main-text { font-size: 28px; white-space: normal; }
+  .social-icons { flex-wrap: wrap; bottom: 10px; left: 10px; gap: 10px; }
+  .nav-right { font-size: 14px; gap: 15px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="name-left">Farrel</div>
+  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+  <nav class="nav-right" id="navMenu">
+    <div id="servicesTab" class="tab" onclick="window.location.href='services.html'">
+      Services <span id="serviceBadge" style="background:red;color:white;border-radius:50%;padding:2px 6px;margin-left:4px;display:none;">0</span>
+    </div>
+    <div id="imagesTab" class="tab" onclick="window.location.href='images.html'">Images</div>
+    <div id="videosTab" class="tab" onclick="window.location.href='videos.html'">Videos</div>
+    <div id="documentsTab" class="tab" onclick="window.location.href='documents.html'">Documents</div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </nav>
+</header>
+
+<main>
+  <div id="slide1" class="slideshow"></div>
+  <div id="slide2" class="slideshow"></div>
+  <div class="main-text">WELCOME TO FARREL'S ICT SUPPORT</div>
+</main>
+
+<footer>
+  <p><strong>Name:</strong> Farrel</p>
+  <p><strong>Location:</strong> Mombasa, Kenya</p>
+  <p><strong>Email:</strong> <a href="mailto:ochiengfarrel17@gmail.com">ochiengfarrel17@gmail.com</a></p>
+  <p><strong>Contact:</strong> +254748713905</p>
+  <p><strong>Profession:</strong> ICT Technician</p>
+</footer>
+
+<div class="social-icons">
+  <a href="https://www.instagram.com" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" width="30"/></a>
+  <a href="https://www.facebook.com" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" width="30"/></a>
+  <a href="https://www.whatsapp.com" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="30"/></a>
+  <a href="https://www.youtube.com" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" width="30"/></a>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById("navMenu").classList.toggle("active"); }
+
+const role = sessionStorage.getItem("role");
+if(!role){ alert("You must log in first!"); window.location.href="index.html"; }
+
+const images = [
+  'https://picsum.photos/id/1005/1600/900',
+  'https://picsum.photos/id/1018/1600/900',
+  'https://picsum.photos/id/1025/1600/900',
+  'https://picsum.photos/id/1033/1600/900'
+];
+let current = 0;
+const slide1 = document.getElementById('slide1');
+const slide2 = document.getElementById('slide2');
+slide1.style.backgroundImage = `url(${images[0]})`;
+slide1.style.opacity = 1; slide2.style.opacity = 0;
+setInterval(()=>{
+  current = (current+1)%images.length;
+  const nextSlide = current%2===0?slide1:slide2;
+  const prevSlide = current%2===0?slide2:slide1;
+  nextSlide.style.backgroundImage = `url(${images[current]})`;
+  nextSlide.style.opacity=1; prevSlide.style.opacity=0;
+},5000);
+
+// Tabs: active for admin, inactive for guest
+if(role === "guest"){
+  document.getElementById("imagesTab").classList.add("inactive");
+  document.getElementById("videosTab").classList.add("inactive");
+  document.getElementById("documentsTab").classList.add("inactive");
+  // disable clicks for guest
+  document.getElementById("imagesTab").onclick=null;
+  document.getElementById("videosTab").onclick=null;
+  document.getElementById("documentsTab").onclick=null;
+}
+
+// Service Badge only for Admin
+const serviceBadge = document.getElementById("serviceBadge");
+if(role==="admin"){
+  let requests = JSON.parse(localStorage.getItem("requests"))||[];
+  const pendingCount = requests.filter(r=>r.status==="Pending").length;
+  if(pendingCount>0){ serviceBadge.style.display="inline"; serviceBadge.textContent=pendingCount; }
+}else{
+  serviceBadge.style.display="none"; // hide for guests
+}
+
+function logout(){ sessionStorage.clear(); window.location.href="index.html"; }
+</script>
+</body>
+</html>
